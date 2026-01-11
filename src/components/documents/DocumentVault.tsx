@@ -233,19 +233,20 @@ export function DocumentVault({ documents, onUpload, onViewDocument, onDownloadD
 
       {/* Documents List View */}
       {viewMode === 'list' && (
-        <div className="overflow-hidden rounded-xl border border-border bg-card">
-          <table className="w-full">
-            <thead>
-              <tr className="table-header">
-                <th className="px-4 py-3 text-left">Document</th>
-                <th className="px-4 py-3 text-left">Type</th>
-                <th className="px-4 py-3 text-left">Version</th>
-                <th className="px-4 py-3 text-left">Status</th>
-                <th className="px-4 py-3 text-left">Modified</th>
-                <th className="px-4 py-3 text-left">Size</th>
-                <th className="px-4 py-3 text-right">Actions</th>
-              </tr>
-            </thead>
+        <div className="hidden overflow-hidden rounded-xl border border-border bg-card md:block">
+          <div className="overflow-x-auto">
+            <table className="w-full">
+              <thead>
+                <tr className="table-header">
+                  <th className="px-4 py-3 text-left">Document</th>
+                  <th className="px-4 py-3 text-left">Type</th>
+                  <th className="px-4 py-3 text-left">Version</th>
+                  <th className="px-4 py-3 text-left">Status</th>
+                  <th className="px-4 py-3 text-left">Modified</th>
+                  <th className="px-4 py-3 text-left">Size</th>
+                  <th className="px-4 py-3 text-right">Actions</th>
+                </tr>
+              </thead>
             <tbody>
               {filteredDocuments.map((doc, index) => {
                 const Icon = typeIcons[doc.type];
@@ -299,6 +300,7 @@ export function DocumentVault({ documents, onUpload, onViewDocument, onDownloadD
               })}
             </tbody>
           </table>
+          </div>
         </div>
       )}
 
