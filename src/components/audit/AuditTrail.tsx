@@ -166,8 +166,8 @@ export function AuditTrail({ logs }: AuditTrailProps) {
         </div>
       </div>
 
-      {/* Audit Log Table */}
-      <div className="overflow-hidden rounded-xl border border-border bg-card">
+      {/* Audit Log Table - Desktop */}
+      <div className="hidden overflow-hidden rounded-xl border border-border bg-card lg:block">
         <div className="overflow-x-auto">
           <table className="w-full">
             <thead>
@@ -239,6 +239,64 @@ export function AuditTrail({ logs }: AuditTrailProps) {
 
         {filteredLogs.length === 0 && (
           <div className="flex flex-col items-center justify-center py-12 text-center">
+            <Filter className="mb-4 h-8 w-8 text-muted-foreground" />
+            <h3 className="mb-1 text-lg font-semibold text-foreground">No logs found</h3>
+            <p className="text-muted-foreground">
+              Try adjusting your search or filter criteria
+            </p>
+          </div>
+        )}
+      </div>
+
+      {/* Audit Log Cards - Mobile/Tablet */}
+      <div className="space-y-3 lg:hidden">
+        {filteredLogs.map((log, index) => {
+          const ActionIcon = actionIcons[log.action] || Eye;
+          const ResourceIcon = resourceIcons[log.resource] || FileText;
+
+          return (
+            <div 
+              key={log.id} 
+              className="animate-fade-in rounded-xl border border-border bg-card p-4"
+              style={{ animationDelay: `${index * 20}ms` }}
+            >
+              <div className="mb-3 flex items-start justify-between">
+                <div className="flex items-center gap-2">
+                  <div className="flex h-8 w-8 items-center justify-center rounded-full bg-muted text-xs font-bold text-foreground">
+                    {log.userName.split(' ').map(n => n[0]).join('').slice(0, 2)}
+                  </div>
+                  <span className="font-medium text-foreground">{log.userName}</span>
+                </div>
+                <span className={cn("inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-medium", actionColors[log.action])}>
+                  <ActionIcon className="h-3 w-3" />
+                  {log.action}
+                </span>
+              </div>
+              
+              <div className="mb-3 flex items-center gap-2 text-sm">
+                <ResourceIcon className="h-4 w-4 text-muted-foreground" />
+                <span className="text-foreground">{log.resource}</span>
+                <span className="text-muted-foreground">•</span>
+                <span className="truncate text-muted-foreground">{log.resourceId}</span>
+              </div>
+
+              <p className="mb-3 text-sm text-muted-foreground">{log.details}</p>
+
+              <div className="flex flex-wrap items-center gap-3 text-xs text-muted-foreground">
+                <div className="flex items-center gap-1">
+                  <Clock className="h-3 w-3" />
+                  <span>{formatTimestamp(log.timestamp)}</span>
+                </div>
+                <code className="rounded bg-muted px-2 py-0.5">
+                  {log.ipAddress}
+                </code>
+              </div>
+            </div>
+          );
+        })}
+
+        {filteredLogs.length === 0 && (
+          <div className="flex flex-col items-center justify-center rounded-xl border border-dashed border-border py-12 text-center">
             <Filter className="mb-4 h-8 w-8 text-muted-foreground" />
             <h3 className="mb-1 text-lg font-semibold text-foreground">No logs found</h3>
             <p className="text-muted-foreground">

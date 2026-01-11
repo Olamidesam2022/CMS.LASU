@@ -36,7 +36,7 @@ const viewTitles: Record<string, string> = {
 const Index = () => {
   const [currentUser, setCurrentUser] = useState<User | null>(null);
   const [activeView, setActiveView] = useState('dashboard');
-  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
   // Handle login
   const handleLogin = (user: User) => {
@@ -127,23 +127,26 @@ const Index = () => {
   };
 
   return (
-    <div className="flex min-h-screen bg-background">
+    <div className="flex min-h-screen w-full bg-background">
       {/* Sidebar */}
       <Sidebar 
         currentUser={currentUser}
         activeView={activeView}
         onViewChange={setActiveView}
         onLogout={handleLogout}
+        isOpen={sidebarOpen}
+        onClose={() => setSidebarOpen(false)}
       />
 
       {/* Main Content */}
       <main className={cn(
         "flex-1 transition-all duration-300",
-        "ml-20 md:ml-72" // Adjust for sidebar width
+        "ml-0 md:ml-20 lg:ml-72" // No margin on mobile, sidebar is an overlay
       )}>
         <Header 
           currentUser={currentUser}
           title={viewTitles[activeView] || 'Dashboard'}
+          onMenuToggle={() => setSidebarOpen(true)}
         />
         <div className="min-h-[calc(100vh-4rem)]">
           {renderView()}
