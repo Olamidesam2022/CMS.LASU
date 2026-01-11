@@ -1,6 +1,43 @@
-import { useState } from 'react';
-import { Bell, Search, Menu } from 'lucide-react';
+import { useState, useRef, useEffect } from 'react';
+import { Bell, Search, Menu, X, AlertTriangle, FileText, Scale } from 'lucide-react';
 import { User } from '@/types/legal';
+import { cn } from '@/lib/utils';
+
+interface Notification {
+  id: string;
+  title: string;
+  message: string;
+  type: 'urgent' | 'info' | 'warning';
+  time: string;
+  read: boolean;
+}
+
+const mockNotifications: Notification[] = [
+  {
+    id: '1',
+    title: 'Urgent Hearing',
+    message: 'LASU vs Federal Ministry - Tomorrow 9:00 AM',
+    type: 'urgent',
+    time: '10m ago',
+    read: false,
+  },
+  {
+    id: '2',
+    title: 'Document Updated',
+    message: 'MoU Agreement v2.0 has been approved',
+    type: 'info',
+    time: '1h ago',
+    read: false,
+  },
+  {
+    id: '3',
+    title: 'Advisory Overdue',
+    message: 'Research Ethics Policy Review is past due',
+    type: 'warning',
+    time: '3h ago',
+    read: true,
+  },
+];
 
 interface HeaderProps {
   currentUser: User;
@@ -11,10 +48,52 @@ interface HeaderProps {
 
 export function Header({ currentUser, title, onMenuToggle, onSearch }: HeaderProps) {
   const [searchQuery, setSearchQuery] = useState('');
+  const [showNotifications, setShowNotifications] = useState(false);
+  const [notifications, setNotifications] = useState(mockNotifications);
+  const notificationRef = useRef<HTMLDivElement>(null);
+
+  const unreadCount = notifications.filter(n => !n.read).length;
 
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchQuery(e.target.value);
     onSearch?.(e.target.value);
+  };
+
+  const markAsRead = (id: string) => {
+    setNotifications(prev => 
+      prev.map(n => n.id === id ? { ...n, read: true } : n)
+    );
+  };
+
+  const markAllAsRead = () => {
+    setNotifications(prev => prev.map(n => ({ ...n, read: true })));
+  };
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (notificationRef.current && !notificationRef.current.contains(event.target as Node)) {
+        setShowNotifications(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  const getNotificationIcon = (type: Notification['type']) => {
+    switch (type) {
+      case 'urgent': return AlertTriangle;
+      case 'warning': return FileText;
+      default: return Scale;
+    }
+  };
+
+  const getNotificationColor = (type: Notification['type']) => {
+    switch (type) {
+      case 'urgent': return 'text-destructive bg-destructive/10';
+      case 'warning': return 'text-warning bg-warning/10';
+      default: return 'text-info bg-info/10';
+    }
   };
 
   return (
@@ -54,12 +133,84 @@ export function Header({ currentUser, title, onMenuToggle, onSearch }: HeaderPro
           </div>
 
           {/* Notifications */}
-          <button className="relative rounded-lg p-2 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground">
-            <Bell className="h-5 w-5" />
-            <span className="absolute right-1 top-1 flex h-4 w-4 items-center justify-center rounded-full bg-destructive text-[10px] font-bold text-destructive-foreground">
-              3
-            </span>
-          </button>
+          <div className="relative" ref={notificationRef}>
+            <button 
+              onClick={() => setShowNotifications(!showNotifications)}
+              className="relative rounded-lg p-2 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+            >
+              <Bell className="h-5 w-5" />
+              {unreadCount > 0 && (
+                <span className="absolute right-1 top-1 flex h-4 w-4 items-center justify-center rounded-full bg-destructive text-[10px] font-bold text-destructive-foreground">
+                  {unreadCount}
+                </span>
+              )}
+            </button>
+
+            {/* Notification Dropdown */}
+            {showNotifications && (
+              <div className="absolute right-0 top-full mt-2 w-80 rounded-xl border border-border bg-card shadow-lg animate-fade-in z-50">
+                <div className="flex items-center justify-between border-b border-border p-3">
+                  <h3 className="font-semibold text-foreground">Notifications</h3>
+                  {unreadCount > 0 && (
+                    <button 
+                      onClick={markAllAsRead}
+                      className="text-xs text-accent hover:underline"
+                    >
+                      Mark all read
+                    </button>
+                  )}
+                </div>
+                
+                <div className="max-h-80 overflow-y-auto">
+                  {notifications.length === 0 ? (
+                    <div className="p-4 text-center text-sm text-muted-foreground">
+                      No notifications
+                    </div>
+                  ) : (
+                    notifications.map((notification) => {
+                      const Icon = getNotificationIcon(notification.type);
+                      return (
+                        <div
+                          key={notification.id}
+                          onClick={() => markAsRead(notification.id)}
+                          className={cn(
+                            "flex gap-3 p-3 cursor-pointer transition-colors hover:bg-muted/50 border-b border-border last:border-0",
+                            !notification.read && "bg-accent/5"
+                          )}
+                        >
+                          <div className={cn("flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-lg", getNotificationColor(notification.type))}>
+                            <Icon className="h-4 w-4" />
+                          </div>
+                          <div className="min-w-0 flex-1">
+                            <div className="flex items-center gap-2">
+                              <p className="text-sm font-medium text-foreground truncate">
+                                {notification.title}
+                              </p>
+                              {!notification.read && (
+                                <span className="h-2 w-2 rounded-full bg-accent flex-shrink-0" />
+                              )}
+                            </div>
+                            <p className="text-xs text-muted-foreground truncate">
+                              {notification.message}
+                            </p>
+                            <p className="text-xs text-muted-foreground mt-1">
+                              {notification.time}
+                            </p>
+                          </div>
+                        </div>
+                      );
+                    })
+                  )}
+                </div>
+
+                <div className="border-t border-border p-2">
+                  <button className="w-full rounded-lg py-2 text-sm font-medium text-accent transition-colors hover:bg-muted">
+                    View All Notifications
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
 
           {/* User Avatar */}
           <div className="hidden items-center gap-3 rounded-lg bg-muted/50 px-3 py-2 md:flex">
