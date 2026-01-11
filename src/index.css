@@ -102,15 +102,22 @@
 
 @layer base {
   * {
-    @apply border-border;
+    @apply border-border box-border;
   }
 
   html {
     font-family: 'Plus Jakarta Sans', sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
   }
 
   body {
-    @apply bg-background text-foreground antialiased;
+    @apply bg-background text-foreground antialiased overflow-x-hidden;
+    min-height: 100vh;
+  }
+
+  #root {
+    @apply min-h-screen w-full overflow-x-hidden;
   }
 }
 
@@ -126,7 +133,7 @@
   }
 
   .metric-card {
-    @apply relative overflow-hidden rounded-xl bg-card p-6 transition-all duration-300;
+    @apply relative overflow-hidden rounded-xl bg-card p-4 sm:p-6 transition-all duration-300;
     box-shadow: var(--card-shadow);
   }
 
@@ -152,7 +159,7 @@
   }
 
   .status-pill {
-    @apply inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-medium;
+    @apply inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-medium whitespace-nowrap;
   }
 
   .status-active {
@@ -188,7 +195,7 @@
   }
 
   .nav-item {
-    @apply flex items-center gap-3 rounded-lg px-4 py-3 text-sm font-medium transition-all duration-200;
+    @apply flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all duration-200;
     @apply text-sidebar-foreground/70 hover:bg-sidebar-accent hover:text-sidebar-foreground;
   }
 
@@ -222,7 +229,7 @@
   }
 
   .risk-alert {
-    @apply relative overflow-hidden rounded-xl border-l-4 border-destructive bg-destructive/5 p-4;
+    @apply relative overflow-hidden rounded-xl border-l-4 border-destructive bg-destructive/5 p-3 sm:p-4;
     animation: pulse-subtle 2s ease-in-out infinite;
   }
 
@@ -232,13 +239,23 @@
   }
 
   .document-card {
-    @apply rounded-lg border border-border/50 bg-card p-4 transition-all duration-200;
+    @apply rounded-lg border border-border/50 bg-card p-3 sm:p-4 transition-all duration-200 overflow-hidden;
     @apply hover:border-accent/50 hover:shadow-md;
   }
 
   .search-input {
-    @apply w-full rounded-lg border border-border bg-background px-4 py-2.5 text-sm;
+    @apply w-full rounded-lg border border-border bg-background px-3 py-2 text-sm;
     @apply placeholder:text-muted-foreground focus:border-accent focus:outline-none focus:ring-2 focus:ring-accent/20;
+  }
+
+  /* Ensure tables don't overflow */
+  .table-container {
+    @apply w-full overflow-x-auto;
+  }
+
+  /* Card content overflow control */
+  .card-content {
+    @apply overflow-hidden;
   }
 }
 

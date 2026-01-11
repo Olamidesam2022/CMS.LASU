@@ -32,14 +32,14 @@ export function MetricCard({
 
   return (
     <div className={cn("metric-card animate-fade-in", className)}>
-      <div className="flex items-start justify-between">
-        <div className="flex-1">
-          <p className="text-sm font-medium text-muted-foreground">{title}</p>
-          <div className="mt-2 flex items-baseline gap-2">
-            <p className="text-3xl font-bold text-foreground">{value}</p>
+      <div className="flex items-start justify-between gap-3">
+        <div className="flex-1 min-w-0">
+          <p className="text-xs sm:text-sm font-medium text-muted-foreground truncate">{title}</p>
+          <div className="mt-1 sm:mt-2 flex items-baseline gap-2 flex-wrap">
+            <p className="text-2xl sm:text-3xl font-bold text-foreground">{value}</p>
             {trend && (
               <span className={cn(
-                "text-sm font-medium",
+                "text-xs sm:text-sm font-medium",
                 trend.isPositive ? "text-success" : "text-destructive"
               )}>
                 {trend.isPositive ? '+' : ''}{trend.value}%
@@ -47,11 +47,11 @@ export function MetricCard({
             )}
           </div>
           {subtitle && (
-            <p className="mt-1 text-sm text-muted-foreground">{subtitle}</p>
+            <p className="mt-1 text-xs sm:text-sm text-muted-foreground truncate">{subtitle}</p>
           )}
         </div>
-        <div className={cn("rounded-xl p-3", iconStyles[variant])}>
-          <Icon className="h-6 w-6" />
+        <div className={cn("rounded-lg sm:rounded-xl p-2 sm:p-3 flex-shrink-0", iconStyles[variant])}>
+          <Icon className="h-5 w-5 sm:h-6 sm:w-6" />
         </div>
       </div>
     </div>

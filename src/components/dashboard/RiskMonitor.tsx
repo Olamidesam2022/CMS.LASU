@@ -46,18 +46,18 @@ export function RiskMonitor({ cases }: RiskMonitorProps) {
   }
 
   return (
-    <div className="space-y-4">
-      <div className="flex items-center gap-2">
-        <AlertTriangle className="h-5 w-5 text-destructive" />
-        <h3 className="text-lg font-semibold text-foreground">
+    <div className="space-y-3 sm:space-y-4 overflow-hidden">
+      <div className="flex flex-wrap items-center gap-2">
+        <AlertTriangle className="h-4 w-4 sm:h-5 sm:w-5 text-destructive flex-shrink-0" />
+        <h3 className="text-base sm:text-lg font-semibold text-foreground">
           Risk Threshold Monitor
         </h3>
-        <span className="rounded-full bg-destructive/10 px-2 py-0.5 text-xs font-medium text-destructive">
+        <span className="rounded-full bg-destructive/10 px-2 py-0.5 text-xs font-medium text-destructive whitespace-nowrap">
           {urgentCases.length} hearing{urgentCases.length > 1 ? 's' : ''} in 72h
         </span>
       </div>
 
-      <div className="space-y-3">
+      <div className="space-y-2 sm:space-y-3">
         {urgentCases.map((caseItem, index) => (
           <div 
             key={caseItem.id} 
@@ -67,25 +67,25 @@ export function RiskMonitor({ cases }: RiskMonitorProps) {
             )}
             style={{ animationDelay: `${index * 100}ms` }}
           >
-            <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-              <div className="min-w-0 flex-1">
-                <div className="flex items-center gap-2">
-                  <span className="text-xs font-medium text-destructive">
+            <div className="flex flex-col gap-2 sm:gap-3">
+              <div className="min-w-0">
+                <div className="flex items-center gap-2 flex-wrap">
+                  <span className="text-xs font-medium text-destructive whitespace-nowrap">
                     {formatTimeRemaining(caseItem.nextHearing)} remaining
                   </span>
                 </div>
-                <h4 className="mt-1 truncate font-semibold text-foreground">
+                <h4 className="mt-1 font-semibold text-foreground text-sm sm:text-base truncate">
                   {caseItem.suitNumber}
                 </h4>
-                <p className="truncate text-sm text-muted-foreground">
+                <p className="text-xs sm:text-sm text-muted-foreground truncate">
                   {caseItem.caseTitle}
                 </p>
               </div>
 
-              <div className="flex flex-wrap gap-3 text-sm text-muted-foreground">
-                <div className="flex items-center gap-1.5">
-                  <Clock className="h-4 w-4" />
-                  <span>
+              <div className="flex flex-wrap gap-2 sm:gap-3 text-xs sm:text-sm text-muted-foreground">
+                <div className="flex items-center gap-1">
+                  <Clock className="h-3 w-3 sm:h-4 sm:w-4 flex-shrink-0" />
+                  <span className="truncate">
                     {caseItem.nextHearing.toLocaleDateString('en-NG', {
                       month: 'short',
                       day: 'numeric',
@@ -94,12 +94,12 @@ export function RiskMonitor({ cases }: RiskMonitorProps) {
                     })}
                   </span>
                 </div>
-                <div className="flex items-center gap-1.5">
-                  <MapPin className="h-4 w-4" />
+                <div className="flex items-center gap-1 max-w-[120px] sm:max-w-none">
+                  <MapPin className="h-3 w-3 sm:h-4 sm:w-4 flex-shrink-0" />
                   <span className="truncate">{caseItem.court}</span>
                 </div>
-                <div className="flex items-center gap-1.5">
-                  <User className="h-4 w-4" />
+                <div className="flex items-center gap-1 max-w-[100px] sm:max-w-none">
+                  <User className="h-3 w-3 sm:h-4 sm:w-4 flex-shrink-0" />
                   <span className="truncate">{caseItem.assignedCounsel}</span>
                 </div>
               </div>
