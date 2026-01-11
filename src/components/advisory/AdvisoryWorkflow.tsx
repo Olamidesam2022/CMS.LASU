@@ -63,18 +63,18 @@ export function AdvisoryWorkflow({ requests, onAddRequest, onViewRequest }: Advi
   };
 
   return (
-    <div className="space-y-4 p-4 md:p-6">
+    <div className="space-y-4 p-3 sm:p-4 md:p-6 overflow-hidden">
       {/* Header */}
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-        <div>
-          <h2 className="text-2xl font-bold text-foreground">Advisory Workflow</h2>
-          <p className="text-muted-foreground">
+      <div className="flex flex-col gap-3 sm:gap-4 sm:flex-row sm:items-center sm:justify-between">
+        <div className="min-w-0">
+          <h2 className="text-xl sm:text-2xl font-bold text-foreground">Advisory Workflow</h2>
+          <p className="text-xs sm:text-sm text-muted-foreground">
             Track legal advice requests from VC Office and Registry
           </p>
         </div>
         <button 
           onClick={onAddRequest}
-          className="gold-button flex items-center gap-2 rounded-lg px-4 py-2.5"
+          className="gold-button flex items-center justify-center gap-2 rounded-lg px-4 py-2 sm:py-2.5 text-sm"
         >
           <Plus className="h-4 w-4" />
           <span>New Request</span>
@@ -82,8 +82,8 @@ export function AdvisoryWorkflow({ requests, onAddRequest, onViewRequest }: Advi
       </div>
 
       {/* Search and Filters */}
-      <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
-        <div className="relative flex-1">
+      <div className="flex flex-col gap-3">
+        <div className="relative">
           <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
           <input
             type="text"
@@ -93,13 +93,13 @@ export function AdvisoryWorkflow({ requests, onAddRequest, onViewRequest }: Advi
             className="search-input w-full pl-10"
           />
         </div>
-        <div className="flex gap-2 overflow-x-auto pb-2 sm:pb-0">
+        <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-thin">
           {(['all', 'Urgent', 'Pending', 'In Progress', 'Completed'] as const).map(status => (
             <button
               key={status}
               onClick={() => setStatusFilter(status)}
               className={cn(
-                "flex-shrink-0 rounded-lg px-3 py-1.5 text-sm font-medium transition-colors",
+                "flex-shrink-0 rounded-lg px-3 py-1.5 text-xs sm:text-sm font-medium transition-colors whitespace-nowrap",
                 statusFilter === status 
                   ? "bg-primary text-primary-foreground" 
                   : "bg-muted text-muted-foreground hover:text-foreground"
@@ -112,23 +112,23 @@ export function AdvisoryWorkflow({ requests, onAddRequest, onViewRequest }: Advi
       </div>
 
       {/* Kanban-style View */}
-      <div className="grid gap-4 lg:grid-cols-4">
+      <div className="grid gap-3 sm:gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
         {(Object.entries(groupedRequests) as [AdvisoryStatus, AdvisoryRequest[]][]).map(([status, items]) => {
           const { icon: StatusIcon, color, bgColor } = statusConfig[status];
           
           return (
-            <div key={status} className="rounded-xl border border-border bg-card">
+            <div key={status} className="rounded-xl border border-border bg-card overflow-hidden">
               {/* Column Header */}
-              <div className={cn("flex items-center gap-2 border-b border-border p-4", bgColor)}>
-                <StatusIcon className={cn("h-5 w-5", color, status === 'In Progress' && "animate-spin")} />
-                <h3 className="font-semibold text-foreground">{status}</h3>
-                <span className="ml-auto rounded-full bg-background px-2 py-0.5 text-xs font-medium text-muted-foreground">
+              <div className={cn("flex items-center gap-2 border-b border-border p-3 sm:p-4", bgColor)}>
+                <StatusIcon className={cn("h-4 w-4 sm:h-5 sm:w-5 flex-shrink-0", color, status === 'In Progress' && "animate-spin")} />
+                <h3 className="font-semibold text-foreground text-sm sm:text-base truncate">{status}</h3>
+                <span className="ml-auto rounded-full bg-background px-2 py-0.5 text-xs font-medium text-muted-foreground flex-shrink-0">
                   {items.length}
                 </span>
               </div>
 
               {/* Column Content */}
-              <div className="max-h-[60vh] space-y-3 overflow-y-auto p-3 scrollbar-thin">
+              <div className="max-h-[50vh] sm:max-h-[60vh] space-y-2 sm:space-y-3 overflow-y-auto p-2 sm:p-3 scrollbar-thin">
                 {items.map((request, index) => {
                   const daysRemaining = getDaysRemaining(request.dueDate);
                   
@@ -136,54 +136,54 @@ export function AdvisoryWorkflow({ requests, onAddRequest, onViewRequest }: Advi
                     <div
                       key={request.id}
                       onClick={() => onViewRequest?.(request)}
-                      className="animate-fade-in cursor-pointer rounded-lg border border-border bg-background p-3 transition-all hover:border-accent/50 hover:shadow-md"
+                      className="animate-fade-in cursor-pointer rounded-lg border border-border bg-background p-2 sm:p-3 transition-all hover:border-accent/50 hover:shadow-md overflow-hidden"
                       style={{ animationDelay: `${index * 50}ms` }}
                     >
-                      <div className="mb-2 flex items-start justify-between">
-                        <span className="text-xs font-medium text-muted-foreground">
+                      <div className="mb-2 flex items-start justify-between gap-2">
+                        <span className="text-[10px] sm:text-xs font-medium text-muted-foreground truncate">
                           {request.requestNumber}
                         </span>
-                        <span className={cn("status-pill text-xs", priorityColors[request.priority])}>
+                        <span className={cn("status-pill text-[10px] sm:text-xs flex-shrink-0", priorityColors[request.priority])}>
                           {request.priority}
                         </span>
                       </div>
                       
-                      <h4 className="mb-2 line-clamp-2 text-sm font-medium text-foreground">
+                      <h4 className="mb-2 line-clamp-2 text-xs sm:text-sm font-medium text-foreground">
                         {request.title}
                       </h4>
                       
-                      <div className="space-y-1.5 text-xs text-muted-foreground">
-                        <div className="flex items-center gap-1.5">
-                          <Building2 className="h-3.5 w-3.5" />
-                          <span>{request.department}</span>
+                      <div className="space-y-1 text-[10px] sm:text-xs text-muted-foreground">
+                        <div className="flex items-center gap-1">
+                          <Building2 className="h-3 w-3 flex-shrink-0" />
+                          <span className="truncate">{request.department}</span>
                         </div>
-                        <div className="flex items-center gap-1.5">
-                          <User className="h-3.5 w-3.5" />
-                          <span>{request.requestedBy}</span>
+                        <div className="flex items-center gap-1">
+                          <User className="h-3 w-3 flex-shrink-0" />
+                          <span className="truncate">{request.requestedBy}</span>
                         </div>
-                        <div className="flex items-center gap-1.5">
-                          <Clock className="h-3.5 w-3.5" />
+                        <div className="flex items-center gap-1">
+                          <Clock className="h-3 w-3 flex-shrink-0" />
                           <span className={cn(
                             daysRemaining <= 1 && status !== 'Completed' && "text-destructive font-medium"
                           )}>
                             {status === 'Completed' 
                               ? 'Completed'
                               : daysRemaining < 0 
-                                ? `Overdue by ${Math.abs(daysRemaining)} days`
+                                ? `Overdue ${Math.abs(daysRemaining)}d`
                                 : daysRemaining === 0 
                                   ? 'Due today'
-                                  : `${daysRemaining} days remaining`
+                                  : `${daysRemaining}d left`
                             }
                           </span>
                         </div>
                       </div>
 
                       {request.assignedTo && (
-                        <div className="mt-3 flex items-center justify-between border-t border-border pt-2">
-                          <span className="text-xs text-muted-foreground">
+                        <div className="mt-2 sm:mt-3 flex items-center justify-between border-t border-border pt-2">
+                          <span className="text-[10px] sm:text-xs text-muted-foreground truncate">
                             {request.assignedTo.split(' ').slice(-1)[0]}
                           </span>
-                          <ArrowRight className="h-3.5 w-3.5 text-muted-foreground" />
+                          <ArrowRight className="h-3 w-3 text-muted-foreground flex-shrink-0" />
                         </div>
                       )}
                     </div>
@@ -191,7 +191,7 @@ export function AdvisoryWorkflow({ requests, onAddRequest, onViewRequest }: Advi
                 })}
 
                 {items.length === 0 && (
-                  <div className="py-8 text-center text-sm text-muted-foreground">
+                  <div className="py-6 sm:py-8 text-center text-xs sm:text-sm text-muted-foreground">
                     No requests
                   </div>
                 )}
