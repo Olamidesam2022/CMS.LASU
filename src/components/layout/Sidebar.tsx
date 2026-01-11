@@ -10,7 +10,8 @@ import {
   LogOut,
   ChevronLeft,
   ChevronRight,
-  Shield
+  Shield,
+  CalendarDays
 } from 'lucide-react';
 import { User, UserRole } from '@/types/legal';
 import { cn } from '@/lib/utils';
@@ -34,8 +35,10 @@ const navItems: NavItem[] = [
   { id: 'litigation', label: 'Litigation Registry', icon: Scale, roles: ['admin', 'legal_officer'] },
   { id: 'advisory', label: 'Advisory Workflow', icon: FileText, roles: ['admin', 'legal_officer'] },
   { id: 'documents', label: 'Document Vault', icon: FolderOpen, roles: ['admin', 'legal_officer'] },
+  { id: 'calendar', label: 'Court Calendar', icon: CalendarDays, roles: ['admin', 'legal_officer'] },
   { id: 'audit', label: 'Audit Trail', icon: ClipboardList, roles: ['admin'] },
   { id: 'users', label: 'User Management', icon: Users, roles: ['admin'] },
+  { id: 'settings', label: 'Settings', icon: Settings, roles: ['admin', 'legal_officer'] },
 ];
 
 export function Sidebar({ currentUser, activeView, onViewChange, onLogout }: SidebarProps) {
@@ -128,16 +131,6 @@ export function Sidebar({ currentUser, activeView, onViewChange, onLogout }: Sid
 
         {/* Action Buttons */}
         <div className={cn("space-y-2", collapsed && "flex flex-col items-center")}>
-          <button
-            className={cn(
-              "nav-item w-full",
-              collapsed && "justify-center"
-            )}
-            title={collapsed ? "Settings" : undefined}
-          >
-            <Settings className="h-5 w-5 flex-shrink-0" />
-            {!collapsed && <span>Settings</span>}
-          </button>
           <button
             onClick={onLogout}
             className={cn(
