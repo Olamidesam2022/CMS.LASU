@@ -17,6 +17,8 @@ import { AdvisoryWorkflow } from '@/components/advisory/AdvisoryWorkflow';
 import { DocumentVault } from '@/components/documents/DocumentVault';
 import { AuditTrail } from '@/components/audit/AuditTrail';
 import { UserManagement } from '@/components/users/UserManagement';
+import { Settings } from '@/components/settings/Settings';
+import { CalendarView } from '@/components/calendar/CalendarView';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
 
@@ -25,8 +27,10 @@ const viewTitles: Record<string, string> = {
   litigation: 'Litigation Registry',
   advisory: 'Advisory Workflow',
   documents: 'Document Vault',
+  calendar: 'Court Calendar',
   audit: 'Audit Trail',
   users: 'User Management',
+  settings: 'Settings',
 };
 
 const Index = () => {
@@ -101,6 +105,15 @@ const Index = () => {
             currentUser={currentUser}
             onAddUser={() => toast.info('Add User dialog would open here')}
             onEditUser={(u) => toast.info(`Editing user: ${u.name}`)}
+          />
+        );
+      case 'settings':
+        return <Settings currentUser={currentUser} />;
+      case 'calendar':
+        return (
+          <CalendarView 
+            cases={mockCases}
+            onViewCase={(c) => toast.info(`Viewing case: ${c.suitNumber}`)}
           />
         );
       default:
