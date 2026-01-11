@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { Bell, Search, Menu } from 'lucide-react';
 import { User } from '@/types/legal';
 
@@ -5,11 +6,19 @@ interface HeaderProps {
   currentUser: User;
   title: string;
   onMenuToggle?: () => void;
+  onSearch?: (query: string) => void;
 }
 
-export function Header({ currentUser, title, onMenuToggle }: HeaderProps) {
+export function Header({ currentUser, title, onMenuToggle, onSearch }: HeaderProps) {
+  const [searchQuery, setSearchQuery] = useState('');
+
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchQuery(e.target.value);
+    onSearch?.(e.target.value);
+  };
+
   return (
-    <header className="sticky top-0 z-40 border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+    <header className="sticky top-0 z-30 border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="flex h-16 items-center justify-between px-4 md:px-6">
         <div className="flex items-center gap-4">
           <button
@@ -34,10 +43,12 @@ export function Header({ currentUser, title, onMenuToggle }: HeaderProps) {
         <div className="flex items-center gap-3">
           {/* Search */}
           <div className="relative hidden md:block">
-            <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+            <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground pointer-events-none" />
             <input
               type="text"
               placeholder="Search cases, documents..."
+              value={searchQuery}
+              onChange={handleSearchChange}
               className="search-input w-64 pl-10"
             />
           </div>
