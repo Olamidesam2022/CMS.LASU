@@ -9,9 +9,10 @@ interface DashboardProps {
   cases: LitigationCase[];
   advisoryRequests: AdvisoryRequest[];
   auditLogs: AuditLog[];
+  onNavigate?: (view: string) => void;
 }
 
-export function Dashboard({ metrics, cases, advisoryRequests, auditLogs }: DashboardProps) {
+export function Dashboard({ metrics, cases, advisoryRequests, auditLogs, onNavigate }: DashboardProps) {
   const pendingAdvisory = advisoryRequests.filter(r => r.status === 'Pending' || r.status === 'Urgent').length;
   const urgentAdvisory = advisoryRequests.filter(r => r.status === 'Urgent').length;
 
@@ -64,7 +65,10 @@ export function Dashboard({ metrics, cases, advisoryRequests, auditLogs }: Dashb
                   <h3 className="font-semibold text-foreground text-sm sm:text-base">Upcoming Hearings</h3>
                   <p className="text-xs sm:text-sm text-muted-foreground">Next 7 days schedule</p>
                 </div>
-                <button className="rounded-lg bg-muted px-2 sm:px-3 py-1.5 text-xs sm:text-sm font-medium text-foreground transition-colors hover:bg-muted/80 whitespace-nowrap flex-shrink-0">
+                <button 
+                  onClick={() => onNavigate?.('calendar')}
+                  className="rounded-lg bg-muted px-2 sm:px-3 py-1.5 text-xs sm:text-sm font-medium text-foreground transition-colors hover:bg-muted/80 whitespace-nowrap flex-shrink-0"
+                >
                   View Calendar
                 </button>
               </div>
@@ -125,7 +129,7 @@ export function Dashboard({ metrics, cases, advisoryRequests, auditLogs }: Dashb
         </div>
 
         {/* Recent Activity */}
-        <RecentActivity logs={auditLogs} />
+        <RecentActivity logs={auditLogs} onViewAll={() => onNavigate?.('audit')} />
       </div>
 
       {/* Quick Stats */}

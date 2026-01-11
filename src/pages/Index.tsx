@@ -68,6 +68,7 @@ const Index = () => {
             cases={mockCases}
             advisoryRequests={mockAdvisoryRequests}
             auditLogs={mockAuditLogs}
+            onNavigate={setActiveView}
           />
         );
       case 'litigation':
@@ -122,6 +123,7 @@ const Index = () => {
           cases={mockCases}
           advisoryRequests={mockAdvisoryRequests}
           auditLogs={mockAuditLogs}
+          onNavigate={setActiveView}
         />;
     }
   };

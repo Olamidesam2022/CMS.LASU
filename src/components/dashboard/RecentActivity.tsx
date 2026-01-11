@@ -4,6 +4,7 @@ import { cn } from '@/lib/utils';
 
 interface RecentActivityProps {
   logs: AuditLog[];
+  onViewAll?: () => void;
 }
 
 const actionIcons: Record<string, React.ElementType> = {
@@ -20,7 +21,7 @@ const resourceIcons: Record<string, React.ElementType> = {
   User: Users,
 };
 
-export function RecentActivity({ logs }: RecentActivityProps) {
+export function RecentActivity({ logs, onViewAll }: RecentActivityProps) {
   const formatTime = (date: Date) => {
     const now = new Date();
     const diff = now.getTime() - date.getTime();
@@ -75,7 +76,10 @@ export function RecentActivity({ logs }: RecentActivityProps) {
       </div>
 
       <div className="border-t border-border p-2 sm:p-3">
-        <button className="w-full rounded-lg py-2 text-xs sm:text-sm font-medium text-accent transition-colors hover:bg-muted">
+        <button 
+          onClick={onViewAll}
+          className="w-full rounded-lg py-2 text-xs sm:text-sm font-medium text-accent transition-colors hover:bg-muted"
+        >
           View All Activity
         </button>
       </div>
