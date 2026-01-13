@@ -1,5 +1,5 @@
 import { useState, useRef } from 'react';
-import { User } from '@/types/legal';
+import { User, LitigationCase, AdvisoryRequest, LegalDocument } from '@/types/legal';
 import { 
   mockCases, 
   mockAdvisoryRequests, 
@@ -19,6 +19,13 @@ import { AuditTrail } from '@/components/audit/AuditTrail';
 import { UserManagement } from '@/components/users/UserManagement';
 import { Settings } from '@/components/settings/Settings';
 import { CalendarView } from '@/components/calendar/CalendarView';
+import { AddCaseDialog } from '@/components/dialogs/AddCaseDialog';
+import { AddAdvisoryDialog } from '@/components/dialogs/AddAdvisoryDialog';
+import { UploadDocumentDialog } from '@/components/dialogs/UploadDocumentDialog';
+import { AddUserDialog } from '@/components/dialogs/AddUserDialog';
+import { ViewCaseDialog } from '@/components/dialogs/ViewCaseDialog';
+import { ViewAdvisoryDialog } from '@/components/dialogs/ViewAdvisoryDialog';
+import { ViewDocumentDialog } from '@/components/dialogs/ViewDocumentDialog';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
 import { useSwipeGesture } from '@/hooks/use-swipe-gesture';
@@ -39,6 +46,20 @@ const Index = () => {
   const [activeView, setActiveView] = useState('dashboard');
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const mainContentRef = useRef<HTMLDivElement>(null);
+
+  // Dialog states
+  const [addCaseOpen, setAddCaseOpen] = useState(false);
+  const [addAdvisoryOpen, setAddAdvisoryOpen] = useState(false);
+  const [uploadDocumentOpen, setUploadDocumentOpen] = useState(false);
+  const [addUserOpen, setAddUserOpen] = useState(false);
+  const [viewCaseOpen, setViewCaseOpen] = useState(false);
+  const [viewAdvisoryOpen, setViewAdvisoryOpen] = useState(false);
+  const [viewDocumentOpen, setViewDocumentOpen] = useState(false);
+  
+  // Selected items for view dialogs
+  const [selectedCase, setSelectedCase] = useState<LitigationCase | null>(null);
+  const [selectedAdvisory, setSelectedAdvisory] = useState<AdvisoryRequest | null>(null);
+  const [selectedDocument, setSelectedDocument] = useState<LegalDocument | null>(null);
 
   // Swipe gestures for mobile sidebar
   useSwipeGesture(mainContentRef, {
@@ -63,6 +84,34 @@ const Index = () => {
     toast.info('You have been logged out');
   };
 
+  // View handlers
+  const handleViewCase = (caseItem: LitigationCase) => {
+    setSelectedCase(caseItem);
+    setViewCaseOpen(true);
+  };
+
+  const handleEditCase = (caseItem: LitigationCase) => {
+    toast.info(`Editing case: ${caseItem.suitNumber}`);
+  };
+
+  const handleViewAdvisory = (request: AdvisoryRequest) => {
+    setSelectedAdvisory(request);
+    setViewAdvisoryOpen(true);
+  };
+
+  const handleViewDocument = (doc: LegalDocument) => {
+    setSelectedDocument(doc);
+    setViewDocumentOpen(true);
+  };
+
+  const handleDownloadDocument = (doc: LegalDocument) => {
+    toast.success(`Downloading: ${doc.name}`);
+  };
+
+  const handleEditUser = (user: User) => {
+    toast.info(`Editing user: ${user.name}`);
+  };
+
   // Show login screen if not authenticated
   if (!currentUser) {
     return <LoginScreen onLogin={handleLogin} />;
@@ -85,26 +134,26 @@ const Index = () => {
         return (
           <LitigationRegistry 
             cases={mockCases}
-            onAddCase={() => toast.info('Add Case dialog would open here')}
-            onViewCase={(c) => toast.info(`Viewing case: ${c.suitNumber}`)}
-            onEditCase={(c) => toast.info(`Editing case: ${c.suitNumber}`)}
+            onAddCase={() => setAddCaseOpen(true)}
+            onViewCase={handleViewCase}
+            onEditCase={handleEditCase}
           />
         );
       case 'advisory':
         return (
           <AdvisoryWorkflow 
             requests={mockAdvisoryRequests}
-            onAddRequest={() => toast.info('Add Request dialog would open here')}
-            onViewRequest={(r) => toast.info(`Viewing request: ${r.requestNumber}`)}
+            onAddRequest={() => setAddAdvisoryOpen(true)}
+            onViewRequest={handleViewAdvisory}
           />
         );
       case 'documents':
         return (
           <DocumentVault 
             documents={mockDocuments}
-            onUpload={() => toast.info('Upload dialog would open here')}
-            onViewDocument={(d) => toast.info(`Viewing document: ${d.name}`)}
-            onDownloadDocument={(d) => toast.success(`Downloading: ${d.name}`)}
+            onUpload={() => setUploadDocumentOpen(true)}
+            onViewDocument={handleViewDocument}
+            onDownloadDocument={handleDownloadDocument}
           />
         );
       case 'audit':
@@ -114,8 +163,8 @@ const Index = () => {
           <UserManagement 
             users={mockUsers}
             currentUser={currentUser}
-            onAddUser={() => toast.info('Add User dialog would open here')}
-            onEditUser={(u) => toast.info(`Editing user: ${u.name}`)}
+            onAddUser={() => setAddUserOpen(true)}
+            onEditUser={handleEditUser}
           />
         );
       case 'settings':
@@ -124,7 +173,7 @@ const Index = () => {
         return (
           <CalendarView 
             cases={mockCases}
-            onViewCase={(c) => toast.info(`Viewing case: ${c.suitNumber}`)}
+            onViewCase={handleViewCase}
           />
         );
       default:
@@ -167,6 +216,15 @@ const Index = () => {
           {renderView()}
         </main>
       </div>
+
+      {/* Dialogs */}
+      <AddCaseDialog open={addCaseOpen} onOpenChange={setAddCaseOpen} />
+      <AddAdvisoryDialog open={addAdvisoryOpen} onOpenChange={setAddAdvisoryOpen} />
+      <UploadDocumentDialog open={uploadDocumentOpen} onOpenChange={setUploadDocumentOpen} />
+      <AddUserDialog open={addUserOpen} onOpenChange={setAddUserOpen} />
+      <ViewCaseDialog open={viewCaseOpen} onOpenChange={setViewCaseOpen} caseItem={selectedCase} />
+      <ViewAdvisoryDialog open={viewAdvisoryOpen} onOpenChange={setViewAdvisoryOpen} request={selectedAdvisory} />
+      <ViewDocumentDialog open={viewDocumentOpen} onOpenChange={setViewDocumentOpen} document={selectedDocument} />
     </div>
   );
 };
