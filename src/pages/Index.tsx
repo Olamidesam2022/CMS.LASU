@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { Navigate } from 'react-router-dom';
 import { LitigationCase, AdvisoryRequest, LegalDocument, User as LegacyUser } from '@/types/legal';
 import { 
@@ -6,9 +6,9 @@ import {
   mockAdvisoryRequests, 
   mockDocuments, 
   mockAuditLogs, 
-  mockMetrics,
-  mockUsers 
+  mockMetrics 
 } from '@/data/mockData';
+import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { Sidebar } from '@/components/layout/Sidebar';
 import { Header } from '@/components/layout/Header';
@@ -48,6 +48,7 @@ const Index = () => {
   const [activeView, setActiveView] = useState('dashboard');
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const mainContentRef = useRef<HTMLDivElement>(null);
+  const [dbUsers, setDbUsers] = useState<LegacyUser[]>([]);
 
   // Dialog states
   const [addCaseOpen, setAddCaseOpen] = useState(false);
@@ -62,6 +63,46 @@ const Index = () => {
   const [selectedCase, setSelectedCase] = useState<LitigationCase | null>(null);
   const [selectedAdvisory, setSelectedAdvisory] = useState<AdvisoryRequest | null>(null);
   const [selectedDocument, setSelectedDocument] = useState<LegalDocument | null>(null);
+
+  // Fetch users from database
+  const fetchUsers = async () => {
+    const { data: profiles, error } = await supabase
+      .from('profiles')
+      .select('*');
+    
+    if (error) {
+      console.error('Error fetching users:', error);
+      return;
+    }
+
+    // Fetch roles for each user
+    const usersWithRoles: LegacyUser[] = await Promise.all(
+      (profiles || []).map(async (p) => {
+        const { data: roleData } = await supabase
+          .from('user_roles')
+          .select('role')
+          .eq('user_id', p.user_id)
+          .single();
+        
+        return {
+          id: p.user_id,
+          name: p.full_name,
+          email: p.email,
+          role: (roleData?.role as 'admin' | 'legal_officer') || 'legal_officer',
+          department: p.department || 'Legal',
+          avatar: p.avatar_url || undefined,
+        };
+      })
+    );
+
+    setDbUsers(usersWithRoles);
+  };
+
+  useEffect(() => {
+    if (user && role === 'admin') {
+      fetchUsers();
+    }
+  }, [user, role]);
 
   // Swipe gestures for mobile sidebar
   useSwipeGesture(mainContentRef, {
@@ -178,7 +219,7 @@ const Index = () => {
       case 'users':
         return (
           <UserManagement 
-            users={mockUsers}
+            users={dbUsers}
             currentUser={currentUser}
             onAddUser={() => setAddUserOpen(true)}
             onEditUser={handleEditUser}
@@ -238,7 +279,7 @@ const Index = () => {
       <AddCaseDialog open={addCaseOpen} onOpenChange={setAddCaseOpen} />
       <AddAdvisoryDialog open={addAdvisoryOpen} onOpenChange={setAddAdvisoryOpen} />
       <UploadDocumentDialog open={uploadDocumentOpen} onOpenChange={setUploadDocumentOpen} />
-      <AddUserDialog open={addUserOpen} onOpenChange={setAddUserOpen} />
+      <AddUserDialog open={addUserOpen} onOpenChange={setAddUserOpen} onUserCreated={fetchUsers} />
       <ViewCaseDialog open={viewCaseOpen} onOpenChange={setViewCaseOpen} caseItem={selectedCase} />
       <ViewAdvisoryDialog open={viewAdvisoryOpen} onOpenChange={setViewAdvisoryOpen} request={selectedAdvisory} />
       <ViewDocumentDialog open={viewDocumentOpen} onOpenChange={setViewDocumentOpen} document={selectedDocument} />
