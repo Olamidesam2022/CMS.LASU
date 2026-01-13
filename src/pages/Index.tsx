@@ -1,5 +1,6 @@
 import { useState, useRef } from 'react';
-import { User, LitigationCase, AdvisoryRequest, LegalDocument } from '@/types/legal';
+import { Navigate } from 'react-router-dom';
+import { LitigationCase, AdvisoryRequest, LegalDocument, User as LegacyUser } from '@/types/legal';
 import { 
   mockCases, 
   mockAdvisoryRequests, 
@@ -8,7 +9,7 @@ import {
   mockMetrics,
   mockUsers 
 } from '@/data/mockData';
-import { LoginScreen } from '@/components/auth/LoginScreen';
+import { useAuth } from '@/contexts/AuthContext';
 import { Sidebar } from '@/components/layout/Sidebar';
 import { Header } from '@/components/layout/Header';
 import { Dashboard } from '@/components/dashboard/Dashboard';
@@ -29,6 +30,7 @@ import { ViewDocumentDialog } from '@/components/dialogs/ViewDocumentDialog';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
 import { useSwipeGesture } from '@/hooks/use-swipe-gesture';
+import { Shield } from 'lucide-react';
 
 const viewTitles: Record<string, string> = {
   dashboard: 'Dashboard',
@@ -42,7 +44,7 @@ const viewTitles: Record<string, string> = {
 };
 
 const Index = () => {
-  const [currentUser, setCurrentUser] = useState<User | null>(null);
+  const { user, profile, role, isLoading, signOut } = useAuth();
   const [activeView, setActiveView] = useState('dashboard');
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const mainContentRef = useRef<HTMLDivElement>(null);
@@ -69,18 +71,9 @@ const Index = () => {
     edgeThreshold: 40
   });
 
-  // Handle login
-  const handleLogin = (user: User) => {
-    setCurrentUser(user);
-    toast.success(`Welcome, ${user.name}`, {
-      description: `Logged in as ${user.role === 'admin' ? 'Administrator' : 'Legal Officer'}`,
-    });
-  };
-
   // Handle logout
-  const handleLogout = () => {
-    setCurrentUser(null);
-    setActiveView('dashboard');
+  const handleLogout = async () => {
+    await signOut();
     toast.info('You have been logged out');
   };
 
@@ -108,14 +101,38 @@ const Index = () => {
     toast.success(`Downloading: ${doc.name}`);
   };
 
-  const handleEditUser = (user: User) => {
-    toast.info(`Editing user: ${user.name}`);
+  const handleEditUser = (legacyUser: LegacyUser) => {
+    toast.info(`Editing user: ${legacyUser.name}`);
   };
 
-  // Show login screen if not authenticated
-  if (!currentUser) {
-    return <LoginScreen onLogin={handleLogin} />;
+  // Show loading state
+  if (isLoading) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-background">
+        <div className="text-center">
+          <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-primary shadow-lg">
+            <Shield className="h-9 w-9 text-primary-foreground animate-pulse" />
+          </div>
+          <p className="text-muted-foreground">Loading...</p>
+        </div>
+      </div>
+    );
   }
+
+  // Redirect to login if not authenticated
+  if (!user) {
+    return <Navigate to="/login" replace />;
+  }
+
+  // Create a compatible user object for components that expect the legacy User type
+  const currentUser: LegacyUser = {
+    id: user.id,
+    name: profile?.full_name || user.email || 'User',
+    email: profile?.email || user.email || '',
+    role: role || 'legal_officer',
+    department: profile?.department || 'Legal',
+    avatar: profile?.avatar_url || undefined,
+  };
 
   // Render the current view
   const renderView = () => {
