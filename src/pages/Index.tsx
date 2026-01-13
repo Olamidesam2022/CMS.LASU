@@ -129,7 +129,7 @@ const Index = () => {
   };
 
   return (
-    <div className="flex min-h-screen w-full bg-background">
+    <div className="flex h-screen w-screen overflow-hidden bg-background">
       {/* Sidebar */}
       <Sidebar 
         currentUser={currentUser}
@@ -141,8 +141,8 @@ const Index = () => {
       />
 
       {/* Main Content */}
-      <main className={cn(
-        "flex-1 transition-all duration-300",
+      <div className={cn(
+        "flex flex-1 flex-col h-full transition-all duration-300 overflow-hidden",
         "ml-0 md:ml-20 lg:ml-72" // No margin on mobile, sidebar is an overlay
       )}>
         <Header 
@@ -150,10 +150,10 @@ const Index = () => {
           title={viewTitles[activeView] || 'Dashboard'}
           onMenuToggle={() => setSidebarOpen(true)}
         />
-        <div className="min-h-[calc(100vh-4rem)]">
+        <main className="flex-1 overflow-y-auto overflow-x-hidden">
           {renderView()}
-        </div>
-      </main>
+        </main>
+      </div>
     </div>
   );
 };
