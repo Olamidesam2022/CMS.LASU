@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useRef } from 'react';
 import { User } from '@/types/legal';
 import { 
   mockCases, 
@@ -21,6 +21,7 @@ import { Settings } from '@/components/settings/Settings';
 import { CalendarView } from '@/components/calendar/CalendarView';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
+import { useSwipeGesture } from '@/hooks/use-swipe-gesture';
 
 const viewTitles: Record<string, string> = {
   dashboard: 'Dashboard',
@@ -37,6 +38,15 @@ const Index = () => {
   const [currentUser, setCurrentUser] = useState<User | null>(null);
   const [activeView, setActiveView] = useState('dashboard');
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const mainContentRef = useRef<HTMLDivElement>(null);
+
+  // Swipe gestures for mobile sidebar
+  useSwipeGesture(mainContentRef, {
+    onSwipeRight: () => setSidebarOpen(true),
+    onSwipeLeft: () => setSidebarOpen(false),
+    threshold: 50,
+    edgeThreshold: 40
+  });
 
   // Handle login
   const handleLogin = (user: User) => {
@@ -129,9 +139,12 @@ const Index = () => {
   };
 
   return (
-    <div className="flex h-screen w-screen overflow-hidden bg-background">
+    <div 
+      ref={mainContentRef}
+      className="flex h-screen w-screen overflow-hidden bg-background touch-pan-y"
+    >
       {/* Sidebar */}
-      <Sidebar 
+      <Sidebar
         currentUser={currentUser}
         activeView={activeView}
         onViewChange={setActiveView}
