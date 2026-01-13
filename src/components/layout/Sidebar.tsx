@@ -136,7 +136,8 @@ export function Sidebar({ currentUser, activeView, onViewChange, onLogout, isOpe
                   onClick={() => handleNavClick(item.id)}
                   className={cn(
                     "nav-item w-full",
-                    isActive && "active"
+                    isActive && "active",
+                    collapsed && !isOpen && "md:justify-center md:px-0"
                   )}
                   title={collapsed && !isOpen ? item.label : undefined}
                 >
@@ -182,7 +183,7 @@ export function Sidebar({ currentUser, activeView, onViewChange, onLogout, isOpe
             }}
             className={cn(
               "nav-item w-full text-destructive/70 hover:bg-destructive/10 hover:text-destructive",
-              collapsed && !isOpen && "md:justify-center"
+              collapsed && !isOpen && "md:justify-center md:px-0"
             )}
             title={collapsed && !isOpen ? "Logout" : undefined}
           >
