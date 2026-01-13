@@ -19,24 +19,30 @@ import {
 } from '@/components/ui/select';
 import { UserRole } from '@/types/legal';
 import { toast } from 'sonner';
+import { supabase } from '@/integrations/supabase/client';
+import { Eye, EyeOff } from 'lucide-react';
 
 interface AddUserDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  onUserCreated?: () => void;
 }
 
-export function AddUserDialog({ open, onOpenChange }: AddUserDialogProps) {
+export function AddUserDialog({ open, onOpenChange, onUserCreated }: AddUserDialogProps) {
   const [formData, setFormData] = useState({
     name: '',
     email: '',
+    password: '',
     role: '' as UserRole | '',
     department: '',
   });
+  const [showPassword, setShowPassword] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!formData.name || !formData.email || !formData.role) {
+    if (!formData.name || !formData.email || !formData.password || !formData.role) {
       toast.error('Please fill in all required fields');
       return;
     }
@@ -48,17 +54,63 @@ export function AddUserDialog({ open, onOpenChange }: AddUserDialogProps) {
       return;
     }
 
-    toast.success('User created successfully', {
-      description: `${formData.name} has been added as a ${formData.role === 'admin' ? 'Administrator' : 'Legal Officer'}.`,
-    });
-    
-    setFormData({
-      name: '',
-      email: '',
-      role: '',
-      department: '',
-    });
-    onOpenChange(false);
+    if (formData.password.length < 6) {
+      toast.error('Password must be at least 6 characters');
+      return;
+    }
+
+    setIsLoading(true);
+
+    try {
+      // Get current session token
+      const { data: sessionData } = await supabase.auth.getSession();
+      const token = sessionData.session?.access_token;
+
+      if (!token) {
+        toast.error('You must be logged in to create users');
+        setIsLoading(false);
+        return;
+      }
+
+      const response = await supabase.functions.invoke('create-user', {
+        body: {
+          email: formData.email,
+          password: formData.password,
+          fullName: formData.name,
+          role: formData.role,
+          department: formData.department || undefined,
+        },
+      });
+
+      if (response.error) {
+        throw new Error(response.error.message || 'Failed to create user');
+      }
+
+      if (response.data?.error) {
+        throw new Error(response.data.error);
+      }
+
+      toast.success('User created successfully', {
+        description: `${formData.name} has been added as a ${formData.role === 'admin' ? 'Administrator' : 'Legal Officer'}. They can now login with their email and password.`,
+      });
+      
+      setFormData({
+        name: '',
+        email: '',
+        password: '',
+        role: '',
+        department: '',
+      });
+      onOpenChange(false);
+      onUserCreated?.();
+    } catch (error: any) {
+      console.error('Error creating user:', error);
+      toast.error('Failed to create user', {
+        description: error.message || 'An unexpected error occurred',
+      });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -78,6 +130,7 @@ export function AddUserDialog({ open, onOpenChange }: AddUserDialogProps) {
               placeholder="e.g., Adamu Johnson"
               value={formData.name}
               onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
+              disabled={isLoading}
             />
           </div>
 
@@ -86,10 +139,34 @@ export function AddUserDialog({ open, onOpenChange }: AddUserDialogProps) {
             <Input
               id="userEmail"
               type="email"
-              placeholder="e.g., adamu.johnson@nnpcgroup.com"
+              placeholder="e.g., adamu.johnson@lasu.edu.ng"
               value={formData.email}
               onChange={(e) => setFormData(prev => ({ ...prev, email: e.target.value }))}
+              disabled={isLoading}
             />
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="userPassword">Password *</Label>
+            <div className="relative">
+              <Input
+                id="userPassword"
+                type={showPassword ? 'text' : 'password'}
+                placeholder="Enter a secure password"
+                value={formData.password}
+                onChange={(e) => setFormData(prev => ({ ...prev, password: e.target.value }))}
+                className="pr-10"
+                disabled={isLoading}
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+              >
+                {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+              </button>
+            </div>
+            <p className="text-xs text-muted-foreground">Minimum 6 characters</p>
           </div>
 
           <div className="space-y-2">
@@ -97,6 +174,7 @@ export function AddUserDialog({ open, onOpenChange }: AddUserDialogProps) {
             <Select
               value={formData.role}
               onValueChange={(value) => setFormData(prev => ({ ...prev, role: value as UserRole }))}
+              disabled={isLoading}
             >
               <SelectTrigger>
                 <SelectValue placeholder="Select role" />
@@ -113,6 +191,7 @@ export function AddUserDialog({ open, onOpenChange }: AddUserDialogProps) {
             <Select
               value={formData.department}
               onValueChange={(value) => setFormData(prev => ({ ...prev, department: value }))}
+              disabled={isLoading}
             >
               <SelectTrigger>
                 <SelectValue placeholder="Select department" />
@@ -128,10 +207,12 @@ export function AddUserDialog({ open, onOpenChange }: AddUserDialogProps) {
           </div>
 
           <DialogFooter>
-            <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
+            <Button type="button" variant="outline" onClick={() => onOpenChange(false)} disabled={isLoading}>
               Cancel
             </Button>
-            <Button type="submit">Create User</Button>
+            <Button type="submit" disabled={isLoading}>
+              {isLoading ? 'Creating...' : 'Create User'}
+            </Button>
           </DialogFooter>
         </form>
       </DialogContent>
