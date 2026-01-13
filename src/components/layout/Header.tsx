@@ -66,7 +66,7 @@ export function Header({ currentUser, title, onMenuToggle, onSearch }: HeaderPro
   };
 
   const markAllAsRead = () => {
-    setNotifications(prev => prev.map(n => ({ ...n, read: true })));
+    setNotifications([]);
   };
 
   // Close dropdown when clicking outside
