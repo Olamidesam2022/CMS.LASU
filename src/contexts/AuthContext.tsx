@@ -1,8 +1,14 @@
-import { createContext, useContext, useEffect, useState, ReactNode } from 'react';
-import { User, Session } from '@supabase/supabase-js';
-import { supabase } from '@/integrations/supabase/client';
+import {
+  createContext,
+  useContext,
+  useEffect,
+  useState,
+  ReactNode,
+} from "react";
+import { User, Session } from "@supabase/supabase-js";
+import { supabase } from "@/integrations/supabase/client";
 
-type AppRole = 'admin' | 'legal_officer';
+type AppRole = "admin" | "legal_officer";
 
 interface UserProfile {
   id: string;
@@ -36,69 +42,66 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     try {
       // Fetch profile
       const { data: profileData, error: profileError } = await supabase
-        .from('profiles')
-        .select('*')
-        .eq('user_id', userId)
+        .from("profiles")
+        .select("*")
+        .eq("user_id", userId)
         .maybeSingle();
 
       if (profileError) {
-        console.error('Error fetching profile:', profileError);
+        console.error("Error fetching profile:", profileError);
       } else {
         setProfile(profileData);
       }
 
-      // Fetch role
-      const { data: roleData, error: roleError } = await supabase
-        .from('user_roles')
-        .select('role')
-        .eq('user_id', userId)
-        .maybeSingle();
+      // Fetch role using database function (bypasses RLS)
+      const { data: roleData, error: roleError } = await supabase.rpc(
+        "get_user_role",
+        { user_id: userId },
+      );
 
       if (roleError) {
-        console.error('Error fetching role:', roleError);
+        console.error("Error fetching role:", roleError);
       } else {
-        setRole(roleData?.role as AppRole || null);
+        setRole((roleData as AppRole) || null);
       }
     } catch (error) {
-      console.error('Error fetching user data:', error);
+      console.error("Error fetching user data:", error);
     }
   };
 
   useEffect(() => {
+    // Clear any existing session to force manual login
+    const clearExistingSession = async () => {
+      await supabase.auth.signOut();
+    };
+
     // Set up auth state listener FIRST
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (event, newSession) => {
-        setSession(newSession);
-        setUser(newSession?.user ?? null);
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange(async (event, newSession) => {
+      setSession(newSession);
+      setUser(newSession?.user ?? null);
 
-        if (newSession?.user) {
-          // Use setTimeout to avoid potential deadlock with Supabase client
-          setTimeout(() => {
-            fetchUserData(newSession.user.id);
-          }, 0);
-        } else {
-          setProfile(null);
-          setRole(null);
-        }
-
-        if (event === 'SIGNED_OUT') {
-          setProfile(null);
-          setRole(null);
-        }
-
-        setIsLoading(false);
-      }
-    );
-
-    // THEN check for existing session
-    supabase.auth.getSession().then(({ data: { session: existingSession } }) => {
-      setSession(existingSession);
-      setUser(existingSession?.user ?? null);
-
-      if (existingSession?.user) {
-        fetchUserData(existingSession.user.id);
+      if (newSession?.user) {
+        // Use setTimeout to avoid potential deadlock with Supabase client
+        setTimeout(() => {
+          fetchUserData(newSession.user.id);
+        }, 0);
+      } else {
+        setProfile(null);
+        setRole(null);
       }
 
+      if (event === "SIGNED_OUT") {
+        setProfile(null);
+        setRole(null);
+      }
+
+      setIsLoading(false);
+    });
+
+    // Clear existing session and start fresh
+    clearExistingSession().then(() => {
       setIsLoading(false);
     });
 
@@ -144,7 +147,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 export function useAuth() {
   const context = useContext(AuthContext);
   if (context === undefined) {
-    throw new Error('useAuth must be used within an AuthProvider');
+    throw new Error("useAuth must be used within an AuthProvider");
   }
   return context;
 }

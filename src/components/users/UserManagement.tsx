@@ -1,42 +1,52 @@
-import { useState } from 'react';
-import { 
-  Search, 
-  Plus, 
-  Shield, 
+import { useState } from "react";
+import {
+  Search,
+  Plus,
+  Shield,
   User as UserIcon,
   Mail,
   Building2,
   MoreHorizontal,
   Edit,
   Trash2,
-  Key
-} from 'lucide-react';
-import { User, UserRole } from '@/types/legal';
-import { cn } from '@/lib/utils';
+  Key,
+} from "lucide-react";
+import { User, UserRole } from "@/types/legal";
+import { cn } from "@/lib/utils";
 
 interface UserManagementProps {
   users: User[];
   currentUser: User;
   onAddUser?: () => void;
   onEditUser?: (user: User) => void;
+  onDeleteUser?: (user: User) => void;
 }
 
 const roleStyles: Record<UserRole, { label: string; color: string }> = {
-  admin: { label: 'Administrator', color: 'bg-accent/20 text-accent-foreground' },
-  legal_officer: { label: 'Legal Officer', color: 'bg-info/10 text-info' },
+  admin: {
+    label: "Administrator",
+    color: "bg-accent/20 text-accent-foreground",
+  },
+  legal_officer: { label: "Legal Officer", color: "bg-info/10 text-info" },
 };
 
-export function UserManagement({ users, currentUser, onAddUser, onEditUser }: UserManagementProps) {
-  const [searchQuery, setSearchQuery] = useState('');
-  const [roleFilter, setRoleFilter] = useState<UserRole | 'all'>('all');
+export function UserManagement({
+  users,
+  currentUser,
+  onAddUser,
+  onEditUser,
+  onDeleteUser,
+}: UserManagementProps) {
+  const [searchQuery, setSearchQuery] = useState("");
+  const [roleFilter, setRoleFilter] = useState<UserRole | "all">("all");
 
-  const filteredUsers = users.filter(user => {
-    const matchesSearch = 
+  const filteredUsers = users.filter((user) => {
+    const matchesSearch =
       user.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
       user.email.toLowerCase().includes(searchQuery.toLowerCase());
-    
-    const matchesRole = roleFilter === 'all' || user.role === roleFilter;
-    
+
+    const matchesRole = roleFilter === "all" || user.role === roleFilter;
+
     return matchesSearch && matchesRole;
   });
 
@@ -45,12 +55,14 @@ export function UserManagement({ users, currentUser, onAddUser, onEditUser }: Us
       {/* Header */}
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h2 className="text-2xl font-bold text-foreground">User Management</h2>
+          <h2 className="text-2xl font-bold text-foreground">
+            User Management
+          </h2>
           <p className="text-muted-foreground">
             Role-based access control (RBAC) administration
           </p>
         </div>
-        <button 
+        <button
           onClick={onAddUser}
           className="gold-button flex items-center gap-2 rounded-lg px-4 py-2.5"
         >
@@ -68,7 +80,7 @@ export function UserManagement({ users, currentUser, onAddUser, onEditUser }: Us
             </div>
             <div>
               <p className="text-2xl font-bold text-foreground">
-                {users.filter(u => u.role === 'admin').length}
+                {users.filter((u) => u.role === "admin").length}
               </p>
               <p className="text-sm text-muted-foreground">Administrators</p>
             </div>
@@ -81,7 +93,7 @@ export function UserManagement({ users, currentUser, onAddUser, onEditUser }: Us
             </div>
             <div>
               <p className="text-2xl font-bold text-foreground">
-                {users.filter(u => u.role === 'legal_officer').length}
+                {users.filter((u) => u.role === "legal_officer").length}
               </p>
               <p className="text-sm text-muted-foreground">Legal Officers</p>
             </div>
@@ -93,7 +105,9 @@ export function UserManagement({ users, currentUser, onAddUser, onEditUser }: Us
               <Key className="h-5 w-5 text-success" />
             </div>
             <div>
-              <p className="text-2xl font-bold text-foreground">{users.length}</p>
+              <p className="text-2xl font-bold text-foreground">
+                {users.length}
+              </p>
               <p className="text-sm text-muted-foreground">Total Users</p>
             </div>
           </div>
@@ -113,18 +127,18 @@ export function UserManagement({ users, currentUser, onAddUser, onEditUser }: Us
           />
         </div>
         <div className="flex gap-2">
-          {(['all', 'admin', 'legal_officer'] as const).map(role => (
+          {(["all", "admin", "legal_officer"] as const).map((role) => (
             <button
               key={role}
               onClick={() => setRoleFilter(role)}
               className={cn(
                 "rounded-lg px-3 py-2 text-sm font-medium transition-colors",
-                roleFilter === role 
-                  ? "bg-primary text-primary-foreground" 
-                  : "bg-muted text-muted-foreground hover:text-foreground"
+                roleFilter === role
+                  ? "bg-primary text-primary-foreground"
+                  : "bg-muted text-muted-foreground hover:text-foreground",
               )}
             >
-              {role === 'all' ? 'All Roles' : roleStyles[role].label}
+              {role === "all" ? "All Roles" : roleStyles[role].label}
             </button>
           ))}
         </div>
@@ -134,29 +148,42 @@ export function UserManagement({ users, currentUser, onAddUser, onEditUser }: Us
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {filteredUsers.map((user, index) => {
           const isCurrentUser = user.id === currentUser.id;
-          
+
           return (
             <div
               key={user.id}
               className={cn(
                 "animate-fade-in rounded-xl border bg-card p-5 transition-all",
-                isCurrentUser ? "border-accent" : "border-border hover:border-accent/50"
+                isCurrentUser
+                  ? "border-accent"
+                  : "border-border hover:border-accent/50",
               )}
               style={{ animationDelay: `${index * 50}ms` }}
             >
               <div className="mb-4 flex items-start justify-between">
                 <div className="flex items-center gap-3">
                   <div className="flex h-12 w-12 items-center justify-center rounded-full bg-accent text-lg font-bold text-accent-foreground">
-                    {user.name.split(' ').map(n => n[0]).join('').slice(0, 2)}
+                    {user.name
+                      .split(" ")
+                      .map((n) => n[0])
+                      .join("")
+                      .slice(0, 2)}
                   </div>
                   <div>
                     <h4 className="font-semibold text-foreground">
                       {user.name}
                       {isCurrentUser && (
-                        <span className="ml-2 text-xs font-normal text-muted-foreground">(You)</span>
+                        <span className="ml-2 text-xs font-normal text-muted-foreground">
+                          (You)
+                        </span>
                       )}
                     </h4>
-                    <span className={cn("status-pill text-xs", roleStyles[user.role].color)}>
+                    <span
+                      className={cn(
+                        "status-pill text-xs",
+                        roleStyles[user.role].color,
+                      )}
+                    >
                       {roleStyles[user.role].label}
                     </span>
                   </div>
@@ -178,19 +205,20 @@ export function UserManagement({ users, currentUser, onAddUser, onEditUser }: Us
               </div>
 
               <div className="flex gap-2 border-t border-border pt-4">
-                <button 
+                <button
                   onClick={() => onEditUser?.(user)}
                   className="flex flex-1 items-center justify-center gap-1.5 rounded-lg bg-muted py-2 text-sm font-medium text-foreground transition-colors hover:bg-muted/80"
                 >
                   <Edit className="h-4 w-4" />
                   <span>Edit</span>
                 </button>
-                <button 
+                <button
+                  onClick={() => onDeleteUser?.(user)}
                   className={cn(
                     "rounded-lg p-2 transition-colors",
-                    isCurrentUser 
-                      ? "cursor-not-allowed bg-muted/50 text-muted-foreground/50" 
-                      : "bg-muted text-muted-foreground hover:bg-destructive/10 hover:text-destructive"
+                    isCurrentUser
+                      ? "cursor-not-allowed bg-muted/50 text-muted-foreground/50"
+                      : "bg-muted text-muted-foreground hover:bg-destructive/10 hover:text-destructive",
                   )}
                   disabled={isCurrentUser}
                 >
@@ -208,7 +236,9 @@ export function UserManagement({ users, currentUser, onAddUser, onEditUser }: Us
           <div className="mb-4 rounded-full bg-muted p-4">
             <UserIcon className="h-8 w-8 text-muted-foreground" />
           </div>
-          <h3 className="mb-1 text-lg font-semibold text-foreground">No users found</h3>
+          <h3 className="mb-1 text-lg font-semibold text-foreground">
+            No users found
+          </h3>
           <p className="text-muted-foreground">
             Try adjusting your search or filter criteria
           </p>

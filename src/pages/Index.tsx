@@ -74,37 +74,29 @@ const Index = () => {
 
   // Fetch users from database
   const fetchUsers = async () => {
-    const { data: profiles, error } = await supabase
-      .from("profiles")
-      .select("*");
+    try {
+      // Use the database function that bypasses RLS
+      const { data: usersData, error } = await supabase.rpc("get_all_users");
 
-    if (error) {
-      console.error("Error fetching users:", error);
-      return;
+      if (error) {
+        console.error("Error fetching users:", error);
+        return;
+      }
+
+      // Transform the data to match LegacyUser format
+      const usersWithRoles: LegacyUser[] = (usersData || []).map((u: any) => ({
+        id: u.user_id,
+        name: u.full_name,
+        email: u.email,
+        role: (u.role as "admin" | "legal_officer") || "legal_officer",
+        department: u.department || "Legal",
+        avatar: u.avatar_url || undefined,
+      }));
+
+      setDbUsers(usersWithRoles);
+    } catch (error) {
+      console.error("Error in fetchUsers:", error);
     }
-
-    // Fetch roles for each user
-    const usersWithRoles: LegacyUser[] = await Promise.all(
-      (profiles || []).map(async (p) => {
-        const { data: roleData } = await supabase
-          .from("user_roles")
-          .select("role")
-          .eq("user_id", p.user_id)
-          .single();
-
-        return {
-          id: p.user_id,
-          name: p.full_name,
-          email: p.email,
-          role:
-            (roleData?.role as "admin" | "legal_officer") || "legal_officer",
-          department: p.department || "Legal",
-          avatar: p.avatar_url || undefined,
-        };
-      }),
-    );
-
-    setDbUsers(usersWithRoles);
   };
 
   useEffect(() => {
@@ -153,6 +145,42 @@ const Index = () => {
 
   const handleEditUser = (legacyUser: LegacyUser) => {
     toast.info(`Editing user: ${legacyUser.name}`);
+  };
+
+  const handleDeleteUser = async (legacyUser: LegacyUser) => {
+    if (
+      !window.confirm(
+        `Are you sure you want to delete ${legacyUser.name}? This action cannot be undone.`,
+      )
+    ) {
+      return;
+    }
+
+    try {
+      const { data, error } = await supabase.rpc("delete_user_admin", {
+        p_user_id: legacyUser.id,
+      });
+
+      if (error) {
+        throw new Error(error.message);
+      }
+
+      if (data?.error) {
+        throw new Error(data.error);
+      }
+
+      toast.success("User deleted successfully", {
+        description: `${legacyUser.name} has been removed from the system.`,
+      });
+
+      // Refresh the user list
+      fetchUsers();
+    } catch (error: any) {
+      console.error("Error deleting user:", error);
+      toast.error("Failed to delete user", {
+        description: error.message || "An unexpected error occurred",
+      });
+    }
   };
 
   // Show loading state
@@ -232,6 +260,7 @@ const Index = () => {
             currentUser={currentUser}
             onAddUser={() => setAddUserOpen(true)}
             onEditUser={handleEditUser}
+            onDeleteUser={handleDeleteUser}
           />
         );
       case "settings":

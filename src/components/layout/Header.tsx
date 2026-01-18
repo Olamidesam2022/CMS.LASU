@@ -10,6 +10,7 @@ import {
 } from "lucide-react";
 import { User } from "@/types/legal";
 import { cn } from "@/lib/utils";
+import { ThemeToggle } from "@/components/ui/theme-toggle";
 
 interface Notification {
   id: string;
@@ -243,6 +244,9 @@ export function Header({
               )}
             </div>
           )}
+
+          {/* Theme Toggle */}
+          <ThemeToggle />
 
           {/* User Avatar */}
           <div className="hidden items-center gap-3 rounded-lg bg-muted/50 px-3 py-2 md:flex">

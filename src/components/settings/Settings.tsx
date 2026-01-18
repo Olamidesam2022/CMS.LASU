@@ -15,13 +15,14 @@ import {
 import { User } from "@/types/legal";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
+import { useTheme } from "next-themes";
 
 interface SettingsProps {
   currentUser: User;
 }
 
 export function Settings({ currentUser }: SettingsProps) {
-  const [darkMode, setDarkMode] = useState(true);
+  const { theme, setTheme } = useTheme();
   const [emailNotifications, setEmailNotifications] = useState(true);
   const [pushNotifications, setPushNotifications] = useState(true);
   const [hearingReminders, setHearingReminders] = useState(true);
@@ -33,7 +34,7 @@ export function Settings({ currentUser }: SettingsProps) {
   };
 
   const handleReset = () => {
-    setDarkMode(true);
+    setTheme("system");
     setEmailNotifications(true);
     setPushNotifications(true);
     setHearingReminders(true);
@@ -75,10 +76,12 @@ export function Settings({ currentUser }: SettingsProps) {
           <div className="border-b border-border p-4">
             <div className="flex items-center gap-3">
               <div className="rounded-lg bg-accent/20 p-2">
-                {darkMode ? (
+                {theme === "dark" ? (
                   <Moon className="h-5 w-5 text-accent-foreground" />
-                ) : (
+                ) : theme === "light" ? (
                   <Sun className="h-5 w-5 text-accent-foreground" />
+                ) : (
+                  <Shield className="h-5 w-5 text-accent-foreground" />
                 )}
               </div>
               <div>
@@ -92,23 +95,53 @@ export function Settings({ currentUser }: SettingsProps) {
           <div className="p-4 space-y-4">
             <div className="flex items-center justify-between">
               <div>
-                <p className="font-medium text-foreground">Dark Mode</p>
-                <p className="text-sm text-muted-foreground">Use dark theme</p>
+                <p className="font-medium text-foreground">
+                  Theme:{" "}
+                  {theme === "light"
+                    ? "Light"
+                    : theme === "dark"
+                      ? "Dark"
+                      : "System"}
+                </p>
+                <p className="text-sm text-muted-foreground">
+                  Choose your preferred theme
+                </p>
               </div>
-              <button
-                onClick={() => setDarkMode(!darkMode)}
-                className={cn(
-                  "relative h-6 w-11 rounded-full transition-colors",
-                  darkMode ? "bg-accent" : "bg-muted",
-                )}
-              >
-                <span
+              <div className="flex gap-2">
+                <button
+                  onClick={() => setTheme("light")}
                   className={cn(
-                    "absolute top-0.5 left-0.5 h-5 w-5 rounded-full bg-white transition-transform",
-                    darkMode && "translate-x-5",
+                    "px-3 py-1 rounded-md text-sm transition-colors",
+                    theme === "light"
+                      ? "bg-accent text-accent-foreground"
+                      : "bg-muted text-muted-foreground hover:bg-muted/80",
                   )}
-                />
-              </button>
+                >
+                  Light
+                </button>
+                <button
+                  onClick={() => setTheme("dark")}
+                  className={cn(
+                    "px-3 py-1 rounded-md text-sm transition-colors",
+                    theme === "dark"
+                      ? "bg-accent text-accent-foreground"
+                      : "bg-muted text-muted-foreground hover:bg-muted/80",
+                  )}
+                >
+                  Dark
+                </button>
+                <button
+                  onClick={() => setTheme("system")}
+                  className={cn(
+                    "px-3 py-1 rounded-md text-sm transition-colors",
+                    theme === "system"
+                      ? "bg-accent text-accent-foreground"
+                      : "bg-muted text-muted-foreground hover:bg-muted/80",
+                  )}
+                >
+                  System
+                </button>
+              </div>
             </div>
           </div>
         </div>
