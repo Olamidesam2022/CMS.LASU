@@ -1,20 +1,20 @@
-import { useState } from 'react';
-import { 
-  Bell, 
-  Moon, 
-  Sun, 
-  Shield, 
-  Database, 
-  Mail, 
+import { useState } from "react";
+import {
+  Bell,
+  Moon,
+  Sun,
+  Shield,
+  Database,
+  Mail,
   Lock,
   Eye,
   EyeOff,
   Save,
-  RotateCcw
-} from 'lucide-react';
-import { User } from '@/types/legal';
-import { cn } from '@/lib/utils';
-import { toast } from 'sonner';
+  RotateCcw,
+} from "lucide-react";
+import { User } from "@/types/legal";
+import { cn } from "@/lib/utils";
+import { toast } from "sonner";
 
 interface SettingsProps {
   currentUser: User;
@@ -29,7 +29,7 @@ export function Settings({ currentUser }: SettingsProps) {
   const [showApiKey, setShowApiKey] = useState(false);
 
   const handleSave = () => {
-    toast.success('Settings saved successfully');
+    toast.success("Settings saved successfully");
   };
 
   const handleReset = () => {
@@ -38,7 +38,7 @@ export function Settings({ currentUser }: SettingsProps) {
     setPushNotifications(true);
     setHearingReminders(true);
     setDeadlineAlerts(true);
-    toast.info('Settings reset to defaults');
+    toast.info("Settings reset to defaults");
   };
 
   return (
@@ -47,7 +47,9 @@ export function Settings({ currentUser }: SettingsProps) {
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h2 className="text-2xl font-bold text-foreground">Settings</h2>
-          <p className="text-muted-foreground">Manage your application preferences</p>
+          <p className="text-muted-foreground">
+            Manage your application preferences
+          </p>
         </div>
         <div className="flex gap-2">
           <button
@@ -73,11 +75,17 @@ export function Settings({ currentUser }: SettingsProps) {
           <div className="border-b border-border p-4">
             <div className="flex items-center gap-3">
               <div className="rounded-lg bg-accent/20 p-2">
-                {darkMode ? <Moon className="h-5 w-5 text-accent-foreground" /> : <Sun className="h-5 w-5 text-accent-foreground" />}
+                {darkMode ? (
+                  <Moon className="h-5 w-5 text-accent-foreground" />
+                ) : (
+                  <Sun className="h-5 w-5 text-accent-foreground" />
+                )}
               </div>
               <div>
                 <h3 className="font-semibold text-foreground">Appearance</h3>
-                <p className="text-sm text-muted-foreground">Customize the look and feel</p>
+                <p className="text-sm text-muted-foreground">
+                  Customize the look and feel
+                </p>
               </div>
             </div>
           </div>
@@ -91,13 +99,13 @@ export function Settings({ currentUser }: SettingsProps) {
                 onClick={() => setDarkMode(!darkMode)}
                 className={cn(
                   "relative h-6 w-11 rounded-full transition-colors",
-                  darkMode ? "bg-accent" : "bg-muted"
+                  darkMode ? "bg-accent" : "bg-muted",
                 )}
               >
                 <span
                   className={cn(
                     "absolute top-0.5 left-0.5 h-5 w-5 rounded-full bg-white transition-transform",
-                    darkMode && "translate-x-5"
+                    darkMode && "translate-x-5",
                   )}
                 />
               </button>
@@ -114,47 +122,57 @@ export function Settings({ currentUser }: SettingsProps) {
               </div>
               <div>
                 <h3 className="font-semibold text-foreground">Notifications</h3>
-                <p className="text-sm text-muted-foreground">Configure alert preferences</p>
+                <p className="text-sm text-muted-foreground">
+                  Configure alert preferences
+                </p>
               </div>
             </div>
           </div>
           <div className="p-4 space-y-4">
             <div className="flex items-center justify-between">
               <div>
-                <p className="font-medium text-foreground">Email Notifications</p>
-                <p className="text-sm text-muted-foreground">Receive updates via email</p>
+                <p className="font-medium text-foreground">
+                  Email Notifications
+                </p>
+                <p className="text-sm text-muted-foreground">
+                  Receive updates via email
+                </p>
               </div>
               <button
                 onClick={() => setEmailNotifications(!emailNotifications)}
                 className={cn(
                   "relative h-6 w-11 rounded-full transition-colors",
-                  emailNotifications ? "bg-accent" : "bg-muted"
+                  emailNotifications ? "bg-accent" : "bg-muted",
                 )}
               >
                 <span
                   className={cn(
                     "absolute top-0.5 left-0.5 h-5 w-5 rounded-full bg-white transition-transform",
-                    emailNotifications && "translate-x-5"
+                    emailNotifications && "translate-x-5",
                   )}
                 />
               </button>
             </div>
             <div className="flex items-center justify-between">
               <div>
-                <p className="font-medium text-foreground">Push Notifications</p>
-                <p className="text-sm text-muted-foreground">Browser notifications</p>
+                <p className="font-medium text-foreground">
+                  Push Notifications
+                </p>
+                <p className="text-sm text-muted-foreground">
+                  Browser notifications
+                </p>
               </div>
               <button
                 onClick={() => setPushNotifications(!pushNotifications)}
                 className={cn(
                   "relative h-6 w-11 rounded-full transition-colors",
-                  pushNotifications ? "bg-accent" : "bg-muted"
+                  pushNotifications ? "bg-accent" : "bg-muted",
                 )}
               >
                 <span
                   className={cn(
                     "absolute top-0.5 left-0.5 h-5 w-5 rounded-full bg-white transition-transform",
-                    pushNotifications && "translate-x-5"
+                    pushNotifications && "translate-x-5",
                   )}
                 />
               </button>
@@ -162,19 +180,21 @@ export function Settings({ currentUser }: SettingsProps) {
             <div className="flex items-center justify-between">
               <div>
                 <p className="font-medium text-foreground">Hearing Reminders</p>
-                <p className="text-sm text-muted-foreground">72-hour hearing alerts</p>
+                <p className="text-sm text-muted-foreground">
+                  72-hour hearing alerts
+                </p>
               </div>
               <button
                 onClick={() => setHearingReminders(!hearingReminders)}
                 className={cn(
                   "relative h-6 w-11 rounded-full transition-colors",
-                  hearingReminders ? "bg-accent" : "bg-muted"
+                  hearingReminders ? "bg-accent" : "bg-muted",
                 )}
               >
                 <span
                   className={cn(
                     "absolute top-0.5 left-0.5 h-5 w-5 rounded-full bg-white transition-transform",
-                    hearingReminders && "translate-x-5"
+                    hearingReminders && "translate-x-5",
                   )}
                 />
               </button>
@@ -182,19 +202,21 @@ export function Settings({ currentUser }: SettingsProps) {
             <div className="flex items-center justify-between">
               <div>
                 <p className="font-medium text-foreground">Deadline Alerts</p>
-                <p className="text-sm text-muted-foreground">Advisory deadline warnings</p>
+                <p className="text-sm text-muted-foreground">
+                  Advisory deadline warnings
+                </p>
               </div>
               <button
                 onClick={() => setDeadlineAlerts(!deadlineAlerts)}
                 className={cn(
                   "relative h-6 w-11 rounded-full transition-colors",
-                  deadlineAlerts ? "bg-accent" : "bg-muted"
+                  deadlineAlerts ? "bg-accent" : "bg-muted",
                 )}
               >
                 <span
                   className={cn(
                     "absolute top-0.5 left-0.5 h-5 w-5 rounded-full bg-white transition-transform",
-                    deadlineAlerts && "translate-x-5"
+                    deadlineAlerts && "translate-x-5",
                   )}
                 />
               </button>
@@ -211,7 +233,9 @@ export function Settings({ currentUser }: SettingsProps) {
               </div>
               <div>
                 <h3 className="font-semibold text-foreground">Security</h3>
-                <p className="text-sm text-muted-foreground">Account security settings</p>
+                <p className="text-sm text-muted-foreground">
+                  Account security settings
+                </p>
               </div>
             </div>
           </div>
@@ -220,26 +244,26 @@ export function Settings({ currentUser }: SettingsProps) {
               <div className="flex items-center justify-between">
                 <p className="font-medium text-foreground">Current Role</p>
                 <span className="rounded-full bg-accent/20 px-3 py-1 text-xs font-medium text-accent-foreground">
-                  {currentUser.role === 'admin' ? 'Administrator' : 'Legal Officer'}
+                  {currentUser.role === "admin"
+                    ? "Administrator"
+                    : "Legal Officer"}
                 </span>
               </div>
             </div>
             <div className="space-y-2">
               <p className="font-medium text-foreground">Last Login</p>
               <p className="text-sm text-muted-foreground">
-                {new Date().toLocaleDateString('en-NG', { 
-                  weekday: 'long',
-                  year: 'numeric',
-                  month: 'long',
-                  day: 'numeric',
-                  hour: '2-digit',
-                  minute: '2-digit'
+                {new Date().toLocaleDateString("en-NG", {
+                  weekday: "long",
+                  year: "numeric",
+                  month: "long",
+                  day: "numeric",
+                  hour: "2-digit",
+                  minute: "2-digit",
                 })}
               </p>
             </div>
-            <button
-              className="inline-flex w-full items-center justify-center gap-2 rounded-lg border border-border bg-card px-4 py-2 text-sm font-medium text-foreground transition-colors hover:bg-muted"
-            >
+            <button className="inline-flex w-full items-center justify-center gap-2 rounded-lg border border-border bg-card px-4 py-2 text-sm font-medium text-foreground transition-colors hover:bg-muted">
               <Lock className="h-4 w-4" />
               Change Password
             </button>
@@ -254,8 +278,12 @@ export function Settings({ currentUser }: SettingsProps) {
                 <Database className="h-5 w-5 text-success" />
               </div>
               <div>
-                <h3 className="font-semibold text-foreground">System Information</h3>
-                <p className="text-sm text-muted-foreground">Application details</p>
+                <h3 className="font-semibold text-foreground">
+                  System Information
+                </h3>
+                <p className="text-sm text-muted-foreground">
+                  Application details
+                </p>
               </div>
             </div>
           </div>
@@ -303,7 +331,7 @@ export function Settings({ currentUser }: SettingsProps) {
             </div>
           </div>
           <button
-            onClick={() => toast.info('Support contact: ict@lasu.edu.ng')}
+            onClick={() => toast.info("Support contact: ict@lasu.edu.ng")}
             className="rounded-lg border border-border bg-card px-4 py-2 text-sm font-medium text-foreground transition-colors hover:bg-muted"
           >
             Contact Support

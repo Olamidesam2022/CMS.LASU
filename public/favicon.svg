@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="32" height="32">
+  <defs>
+    <style>
+      .scale-beam { fill: #1e40af; }
+      .scale-pan { fill: #3b82f6; }
+      .weight { fill: #1e40af; }
+    </style>
+  </defs>
+
+  <!-- Scales of Justice -->
+  <!-- Beam -->
+  <rect x="4" y="14" width="24" height="2" class="scale-beam" rx="1"/>
+
+  <!-- Left pan -->
+  <rect x="2" y="16" width="8" height="12" class="scale-pan" rx="1"/>
+  <rect x="4" y="18" width="4" height="8" fill="#ffffff" rx="0.5"/>
+
+  <!-- Right pan -->
+  <rect x="22" y="16" width="8" height="12" class="scale-pan" rx="1"/>
+  <rect x="24" y="18" width="4" height="8" fill="#ffffff" rx="0.5"/>
+
+  <!-- Weights -->
+  <circle cx="6" cy="26" r="2" class="weight"/>
+  <circle cx="26" cy="26" r="2" class="weight"/>
+
+  <!-- Chains -->
+  <line x1="6" y1="16" x2="6" y2="24" stroke="#1e40af" stroke-width="1"/>
+  <line x1="26" y1="16" x2="26" y2="24" stroke="#1e40af" stroke-width="1"/>
+</svg>

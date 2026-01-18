@@ -1,7 +1,0 @@
-project_id = "iklhebsriojrxsyrnynz"
-
-[functions.create-user]
-verify_jwt = false
-
-[functions.bootstrap-admin]
-verify_jwt = false
